@@ -19,7 +19,6 @@ BuildRequires:  libjpeg-devel
 BuildRequires:  libtool
 BuildRequires:  pkgconfig(cairo)
 BuildRequires:  pkgconfig(glib-2.0)
-BuildRequires:  pkgconfig(lcms)
 BuildRequires:  pkgconfig(libcurl)
 BuildRequires:  pkgconfig(libpng)
 BuildRequires:  pkgconfig(libxml-2.0)
@@ -109,6 +108,7 @@ and pdffonts (PDF font analyzer).
 %prep
 %setup -q -n %{name}-%{version}/poppler
 
+# note: cms doesn't do anything until lcms2 is packaged and build required
 %build
 autoreconf -vfi %configure \
   --enable-shared \
