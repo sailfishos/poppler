@@ -24,7 +24,7 @@ BuildRequires:  pkgconfig(nss)
 BuildRequires:  pkgconfig(libcurl)
 BuildRequires:  pkgconfig(libpng)
 BuildRequires:  pkgconfig(libxml-2.0)
-BuildRequires:  zlib-devel
+BuildRequires:  pkgconfig(zlib)
 BuildRequires:  pkgconfig(Qt5Core)
 BuildRequires:  pkgconfig(Qt5Gui)
 BuildRequires:  pkgconfig(Qt5Xml)
