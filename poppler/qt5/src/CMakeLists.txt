@@ -1,8 +1,6 @@
 add_definitions(${QT5_DEFINITIONS})
 add_definitions(${Qt5Core_DEFINITIONS})
 
-set(CMAKE_AUTOMOC ON)
-
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${Qt5Core_INCLUDE_DIRS}
@@ -32,7 +30,7 @@ set(poppler_qt5_SRCS
   ArthurOutputDev.cc
 )
 add_library(poppler-qt5 SHARED ${poppler_qt5_SRCS})
-set_target_properties(poppler-qt5 PROPERTIES VERSION 1.5.0 SOVERSION 1)
+set_target_properties(poppler-qt5 PROPERTIES VERSION 1.7.0 SOVERSION 1)
 target_link_libraries(poppler-qt5 poppler ${Qt5Core_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Xml_LIBRARIES})
 if(MSVC)
 target_link_libraries(poppler-qt5 poppler ${poppler_LIBS})

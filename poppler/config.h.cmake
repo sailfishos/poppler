@@ -18,8 +18,14 @@
 /* Do not hardcode the library location */
 #cmakedefine ENABLE_RELOCATABLE 1
 
-/* Use zlib instead of builtin zlib decoder. */
+/* Build against zlib. */
 #cmakedefine ENABLE_ZLIB 1
+
+/* Use zlib instead of builtin zlib decoder to uncompress flate streams. */
+#cmakedefine ENABLE_ZLIB_UNCOMPRESS 1
+
+/* Build against libnss3 for digital signature validation */
+#cmakedefine ENABLE_NSS3 1
 
 /* Use cairo for rendering. */
 #cmakedefine HAVE_CAIRO 1
@@ -57,6 +63,9 @@
 
 /* Defines if gmtime_r is available on your system */
 #cmakedefine HAVE_GMTIME_R 1
+
+/* Defines if timegm is available on your system */
+#cmakedefine HAVE_TIMEGM 1
 
 /* Define if you have the iconv() function and it works. */
 #cmakedefine HAVE_ICONV 1
@@ -219,8 +228,8 @@
 #define HAVE_BOOLEAN
 #endif
 
-/* MS has defined snprintf as deprecated */
-#ifdef _MSC_VER
+/* MS defined snprintf as deprecated but then added it in Visual Studio 2015. */
+#if defined(_MSC_VER) && _MSC_VER < 1900
 #define snprintf _snprintf
 #endif
 
