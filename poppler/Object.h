@@ -21,6 +21,7 @@
 // Copyright (C) 2013 Thomas Freitag <Thomas.Freitag@alfa.de>
 // Copyright (C) 2013 Adrian Johnson <ajohnson@redneon.com>
 // Copyright (C) 2013 Adrian Perez de Castro <aperez@igalia.com>
+// Copyright (C) 2016 Jakub Kucharski <jakubkucharski97@gmail.com>
 //
 // To see a description of the changes please see the Changelog file that
 // came with your tarball or type make ChangeLog if you are building from git
@@ -50,7 +51,14 @@
         abort(); \
     }
 
-#define OBJECT_3TYPES_CHECK(wanted_type1, wanted_type2, wanted_type3) \
+#define OBJECT_2TYPES_CHECK(wanted_type1, wanted_type2) \
+    if (unlikely(type != wanted_type1) && unlikely(type != wanted_type2)) { \
+        error(errInternal, 0, "Call to Object where the object was type {0:d}, " \
+	      "not the expected type {1:d} or {2:d}", type, wanted_type1, wanted_type2); \
+        abort(); \
+    }
+
+#define OBJECT_3TYPES_CHECK(wanted_type1, wanted_type2, wanted_type3)	\
     if (unlikely(type != wanted_type1) && unlikely(type != wanted_type2) && unlikely(type != wanted_type3)) { \
         error(errInternal, 0, "Call to Object where the object was type {0:d}, " \
 	      "not the expected type {1:d}, {2:d} or {3:d}", type, wanted_type1, wanted_type2, wanted_type3); \
@@ -181,6 +189,7 @@ public:
   GBool isEOF() { return type == objEOF; }
   GBool isNone() { return type == objNone; }
   GBool isInt64() { return type == objInt64; }
+  GBool isIntOrInt64() { return type == objInt || type == objInt64; }
 
   // Special type checking.
   GBool isName(const char *nameA)
@@ -213,6 +222,8 @@ public:
   int getRefGen() { OBJECT_TYPE_CHECK(objRef); return ref.gen; }
   char *getCmd() { OBJECT_TYPE_CHECK(objCmd); return cmd; }
   long long getInt64() { OBJECT_TYPE_CHECK(objInt64); return int64g; }
+  long long getIntOrInt64() { OBJECT_2TYPES_CHECK(objInt, objInt64);
+    return type == objInt ? intg : int64g; }
 
   // Array accessors.
   int arrayGetLength();
@@ -225,6 +236,7 @@ public:
   int dictGetLength();
   void dictAdd(char *key, Object *val);
   void dictSet(const char *key, Object *val);
+  void dictRemove(const char *key);
   GBool dictIs(const char *dictType);
   Object *dictLookup(const char *key, Object *obj, int recursion = 0);
   Object *dictLookupNF(const char *key, Object *obj);
@@ -308,7 +320,10 @@ inline void Object::dictAdd(char *key, Object *val)
   { OBJECT_TYPE_CHECK(objDict); dict->add(key, val); }
 
 inline void Object::dictSet(const char *key, Object *val)
- 	{ OBJECT_TYPE_CHECK(objDict); dict->set(key, val); }
+  { OBJECT_TYPE_CHECK(objDict); dict->set(key, val); }
+
+inline void Object::dictRemove(const char *key)
+  { OBJECT_TYPE_CHECK(objDict); dict->remove(key); }
 
 inline GBool Object::dictIs(const char *dictType)
   { OBJECT_TYPE_CHECK(objDict); return dict->is(dictType); }

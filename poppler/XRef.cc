@@ -20,10 +20,11 @@
 // Copyright (C) 2007 Carlos Garcia Campos <carlosgc@gnome.org>
 // Copyright (C) 2009, 2010 Ilya Gorenbein <igorenbein@finjan.com>
 // Copyright (C) 2010 Hib Eris <hib@hiberis.nl>
-// Copyright (C) 2012, 2013 Thomas Freitag <Thomas.Freitag@kabelmail.de>
+// Copyright (C) 2012, 2013, 2016 Thomas Freitag <Thomas.Freitag@kabelmail.de>
 // Copyright (C) 2012, 2013 Fabio D'Urso <fabiodurso@hotmail.it>
 // Copyright (C) 2013, 2014 Adrian Johnson <ajohnson@redneon.com>
 // Copyright (C) 2013 Pino Toscano <pino@kde.org>
+// Copyright (C) 2016 Jakub Kucharski <jakubkucharski97@gmail.com>
 //
 // To see a description of the changes please see the Changelog file that
 // came with your tarball or type make ChangeLog if you are building from git
@@ -286,6 +287,7 @@ void XRef::init() {
   entries = NULL;
   capacity = 0;
   size = 0;
+  modified = gFalse;
   streamEnds = NULL;
   streamEndsLen = 0;
   objStrs = new PopplerCache(5);
@@ -297,6 +299,7 @@ void XRef::init() {
   ownerPasswordOk = gFalse;
   rootNum = -1;
   strOwner = gFalse;
+  xrefReconstructed = gFalse;
 }
 
 XRef::XRef() {
@@ -972,7 +975,12 @@ GBool XRef::constructXRef(GBool *wasReconstructed, GBool needCatalogDict) {
 	do {
 	  ++p;
 	} while (*p && isdigit(*p & 0xff));
-	if (isspace(*p & 0xff)) {
+	if ((*p & 0xff) == 0 || isspace(*p & 0xff)) {
+          if ((*p & 0xff) == 0) {
+            //new line, continue with next line!
+            str->getLine(buf, 256);
+            p = buf - 1;
+          }
 	  do {
 	    ++p;
 	  } while (*p && isspace(*p & 0xff));
@@ -981,7 +989,12 @@ GBool XRef::constructXRef(GBool *wasReconstructed, GBool needCatalogDict) {
 	    do {
 	      ++p;
 	    } while (*p && isdigit(*p & 0xff));
-	    if (isspace(*p & 0xff)) {
+	    if ((*p & 0xff) == 0 || isspace(*p & 0xff)) {
+              if ((*p & 0xff) == 0) {
+                //new line, continue with next line!
+                str->getLine(buf, 256);
+                p = buf - 1;
+              }
 	      do {
 		++p;
 	      } while (*p && isspace(*p & 0xff));
@@ -1249,6 +1262,12 @@ Object *XRef::fetch(int num, int gen, Object *obj, int recursion) {
   return obj;
 
  err:
+  if (!xRefStream && !xrefReconstructed) {
+    error(errInternal, -1, "xref num {0:d} not found but needed, try to reconstruct\n", num);
+    rootNum = -1;
+    constructXRef(&xrefReconstructed);
+    return fetch(num, gen, obj, ++recursion);
+  }
   return obj->initNull();
 }
 
@@ -1271,6 +1290,44 @@ Object *XRef::getDocInfo(Object *obj) {
 // Added for the pdftex project.
 Object *XRef::getDocInfoNF(Object *obj) {
   return trailerDict.dictLookupNF("Info", obj);
+}
+
+Object *XRef::createDocInfoIfNoneExists(Object *obj) {
+  getDocInfo(obj);
+
+  if (obj->isDict()) {
+    return obj;
+  } else if (!obj->isNull()) {
+    // DocInfo exists, but isn't a dictionary (doesn't comply with the PDF reference)
+    obj->free();
+    removeDocInfo();
+  }
+
+  obj->initDict(this);
+
+  Ref ref = addIndirectObject(obj);
+
+  Object objRef;
+  objRef.initRef(ref.num, ref.gen);
+
+  trailerDict.dictSet("Info", &objRef);
+
+  objRef.free();
+
+  return obj;
+}
+
+void XRef::removeDocInfo() {
+  Object infoObjRef;
+  getDocInfoNF(&infoObjRef);
+  if (infoObjRef.isNull()) {
+    return;
+  }
+
+  trailerDict.dictRemove("Info");
+
+  removeIndirectObject(infoObjRef.getRef());
+  infoObjRef.free();
 }
 
 GBool XRef::getStreamEnd(Goffset streamStart, Goffset *streamEnd) {
@@ -1356,6 +1413,7 @@ void XRef::setModifiedObject (Object* o, Ref r) {
   e->obj.free();
   o->copy(&(e->obj));
   e->setFlag(XRefEntry::Updated, gTrue);
+  setModified();
 }
 
 Ref XRef::addIndirectObject (Object* o) {
@@ -1381,6 +1439,7 @@ Ref XRef::addIndirectObject (Object* o) {
   e->type = xrefEntryUncompressed;
   o->copy(&e->obj);
   e->setFlag(XRefEntry::Updated, gTrue);
+  setModified();
 
   Ref r;
   r.num = entryIndexToUse;
@@ -1402,6 +1461,7 @@ void XRef::removeIndirectObject(Ref r) {
   e->type = xrefEntryFree;
   e->gen++;
   e->setFlag(XRefEntry::Updated, gTrue);
+  setModified();
 }
 
 void XRef::writeXRef(XRef::XRefWriter *writer, GBool writeAllEntries) {

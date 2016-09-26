@@ -15,7 +15,7 @@
 //
 // Copyright (C) 2006 Scott Turner <scotty1024@mac.com>
 // Copyright (C) 2007, 2008 Julien Rebetez <julienr@svn.gnome.org>
-// Copyright (C) 2007-2013 Albert Astals Cid <aacid@kde.org>
+// Copyright (C) 2007-2013, 2015, 2016 Albert Astals Cid <aacid@kde.org>
 // Copyright (C) 2007-2013 Carlos Garcia Campos <carlosgc@gnome.org>
 // Copyright (C) 2007, 2008 Iñigo Martínez <inigomartinez@gmail.com>
 // Copyright (C) 2007 Jeff Muizelaar <jeff@infidigm.net>
@@ -29,7 +29,7 @@
 // Copyright (C) 2012, 2015 Tobias Koenig <tokoe@kdab.com>
 // Copyright (C) 2013 Peter Breitenlohner <peb@mppmu.mpg.de>
 // Copyright (C) 2013 Adrian Johnson <ajohnson@redneon.com>
-// Copyright (C) 2014 Marek Kasik <mkasik@redhat.com>
+// Copyright (C) 2014, 2015 Marek Kasik <mkasik@redhat.com>
 // Copyright (C) 2014 Jiri Slaby <jirislaby@gmail.com>
 // Copyright (C) 2014 Anuj Khare <khareanuj18@gmail.com>
 // Copyright (C) 2015 Petr Gajdos <pgajdos@suse.cz>
@@ -4052,6 +4052,9 @@ void Annot::layoutText(GooString *text, GooString *outBuf, int *i,
   double w = 0.0;
   int uLen, n;
   double dx, dy, ox, oy;
+  if (!text) {
+    return;
+  }
   GBool unicode = text->hasUnicodeMarker();
   GBool spacePrev;              // previous character was a space
 
@@ -4122,7 +4125,7 @@ void Annot::layoutText(GooString *text, GooString *outBuf, int *i,
         // This assumes an identity CMap.
         outBuf->append((uChar >> 8) & 0xff);
         outBuf->append(uChar & 0xff);
-      } else if (ccToUnicode->mapToCharCode(&uChar, &c, 2)) {
+      } else if (ccToUnicode->mapToCharCode(&uChar, &c, 1)) {
         ccToUnicode->decRefCnt();
         if (font->isCIDFont()) {
           // TODO: This assumes an identity CMap.  It should be extended to
@@ -6151,7 +6154,7 @@ void AnnotInk::draw(Gfx *gfx, GBool printing) {
 
     for (int i = 0; i < inkListLength; ++i) {
       const AnnotPath * path = inkList[i];
-      if (path->getCoordsLength() != 0) {
+      if (path && path->getCoordsLength() != 0) {
         appearBuf->appendf ("{0:.2f} {1:.2f} m\n", path->getX(0) - rect->x1, path->getY(0) - rect->y1);
         appearBBox->extendTo (path->getX(0) - rect->x1, path->getY(0) - rect->y1);
 
@@ -6846,6 +6849,7 @@ AnnotRichMedia::Content::Content(Dict *dict) {
       obj2.free();
     }
   } else {
+    nConfigurations = 0;
     configurations = NULL;
   }
   obj1.free();
@@ -6876,6 +6880,7 @@ AnnotRichMedia::Content::Content(Dict *dict) {
     obj2.free();
 
   } else {
+    nAssets = 0;
     assets = NULL;
   }
   obj1.free();
@@ -7061,6 +7066,7 @@ AnnotRichMedia::Instance::Instance(Dict *dict)
   } else {
     params = NULL;
   }
+  obj1.free();
 }
 
 AnnotRichMedia::Instance::~Instance()

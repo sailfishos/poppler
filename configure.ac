@@ -1,5 +1,5 @@
 m4_define([poppler_version_major],[0])
-m4_define([poppler_version_minor],[36])
+m4_define([poppler_version_minor],[47])
 m4_define([poppler_version_micro],[0])
 m4_define([poppler_version],[poppler_version_major.poppler_version_minor.poppler_version_micro])
 
@@ -178,14 +178,10 @@ AC_LANG_CPLUSPLUS
 AC_CHECK_DECL(gettimeofday, [AC_CHECK_FUNC(gettimeofday, AC_DEFINE(HAVE_GETTIMEOFDAY, 1, [Defines if gettimeofday is available on your system]))],[],[#include <sys/time.h>])
 AC_CHECK_FUNC(localtime_r, AC_DEFINE(HAVE_LOCALTIME_R, 1, [Defines if localtime_r is available on your system]))
 AC_CHECK_FUNC(gmtime_r, AC_DEFINE(HAVE_GMTIME_R, 1, [Defines if gmtime_r is available on your system]))
+AC_CHECK_FUNC(timegm, AC_DEFINE(HAVE_TIMEGM, 1, [Defines if timegm is available on your system]))
 AC_CHECK_FUNC(rand_r, AC_DEFINE(HAVE_RAND_R, 1, [Defines if rand_r is available on your system]))
 
 dnl ##### Check for extra libraries needed by X.  (LynxOS needs this.)
-AC_CHECK_FUNC(gethostbyname)
-if test $ac_cv_func_gethostbyname = no; then
-  AC_CHECK_LIB(bsd, gethostbyname, X_EXTRA_LIBS="$X_EXTRA_LIBS -lbsd")
-fi
-
 AC_CHECK_FUNC(nanosleep,,)
 dnl try in librt if not found in current LIBS
 if test x$ac_cv_func_nanosleep = xno
@@ -219,14 +215,14 @@ if test x$enable_libopenjpeg = xopenjpeg1 || test x$enable_libopenjpeg = xauto; 
       [openjpeg1="yes"
        LIBOPENJPEG_LIBS="-lopenjpeg"],[openjpeg_header=no])
      AC_CHECK_HEADERS([openjpeg.h],,
-		      [openjpeg="no"])])
+		      [openjpeg_header="no"])])
 fi
 
 dnl test for libopenjpeg2
 if test x$openjpeg1 = xno; then
   if test x$enable_libopenjpeg = xopenjpeg2 || test x$enable_libopenjpeg = xauto; then
     PKG_CHECK_MODULES(LIBOPENJPEG, libopenjp2,
-                      [openjpeg2=yes],[])
+                      [openjpeg2=yes],[openjpeg2=no])
   fi
 fi
 
@@ -264,9 +260,28 @@ else
   enable_libopenjpeg=no
 fi
 
+dnl Test for NSS
+AC_ARG_ENABLE(libnss,
+        AC_HELP_STRING([--disable-nss],
+                       [Do not build against libnss3.]),
+              enable_libnss=$enableval,
+              enable_libnss="try")
+
+if test x$enable_libnss != xno; then
+  PKG_CHECK_MODULES(NSS3, nss, [enable_nss="yes"],
+      [enable_nss="no"])
+fi
+
+if test x$enable_nss = xyes; then
+  AC_DEFINE(ENABLE_NSS3, 1, [Build against NSS.])
+fi
+
 AM_CONDITIONAL(BUILD_LIBOPENJPEG, test x$openjpeg1 = xyes || test x$openjpeg2 = xyes)
 AH_TEMPLATE([ENABLE_LIBOPENJPEG],
 	    [Use libopenjpeg instead of builtin jpeg2000 decoder.])
+
+AM_CONDITIONAL(BUILD_NSS, test x$enable_nss = xyes)
+AH_TEMPLATE([ENABLE_NSS3], [Build Poppler against NSS for digital signature support.])
 
 dnl ##### Test for libtiff
 AC_ARG_ENABLE(libtiff,
@@ -344,31 +359,53 @@ fi
 AC_CHECK_FUNCS(pread64 lseek64)
 
 dnl Test for zlib
-AC_ARG_ENABLE([zlib],
-  [AS_HELP_STRING([--enable-zlib],[Build with zlib])],
-  [],[enable_zlib="no"])
+AC_ARG_ENABLE(zlib,
+	      AC_HELP_STRING([--disable-zlib],
+			     [Don't build against zlib.]),
+	      enable_zlib=$enableval,
+	      enable_zlib="try")
+
+AC_ARG_ENABLE([zlib_uncompress],
+	      AS_HELP_STRING([--enable-zlib-uncompress],
+			     [Use zlib to uncompress flate streams (not totally safe)]),
+              enable_zlib_uncompress=$enableval,
+              enable_zlib_uncompress="no")
+
 if test x$enable_zlib = xyes; then
-  AC_CHECK_LIB([z], [inflate],,
-	       AC_MSG_ERROR("*** zlib library not found ***"))
-  AC_CHECK_HEADERS([zlib.h],,
-		   AC_MSG_ERROR("*** zlib headers not found ***"))
+   AC_CHECK_LIB([z], [inflate],,
+        AC_MSG_ERROR("*** zlib library not found ***"))
+   AC_CHECK_HEADERS([zlib.h],,
+	AC_MSG_ERROR("*** zlib headers not found ***"))
 elif test x$enable_zlib = xtry; then
-  AC_CHECK_LIB([z], [inflate],
-               [enable_zlib="yes"],
-	       [enable_zlib="no"])
-  AC_CHECK_HEADERS([zlib.h],,
-		   [enable_zlib="no"])
+   AC_CHECK_LIB([z], [inflate],
+	        [enable_zlib="yes"],
+		[enable_zlib="no"])
+   AC_CHECK_HEADERS([zlib.h],,
+		[enable_zlib="no"])
 fi
 
 if test x$enable_zlib = xyes; then
-  ZLIB_LIBS="-lz"
-  AC_SUBST(ZLIB_LIBS)
-  AC_DEFINE(ENABLE_ZLIB)
+    ZLIB_LIBS="-lz"
+    AC_SUBST(ZLIB_LIBS)
+    AC_DEFINE(ENABLE_ZLIB, 1, [Build against zlib.])
+
+    if test x$enable_zlib_uncompress = xyes; then
+        AC_DEFINE(ENABLE_ZLIB_UNCOMPRESS, 1,
+             [Use zlib instead of builtin zlib decoder to uncompress flate streams.])
+    fi
+else
+    if test x$enable_zlib_uncompress = xyes; then
+	echo "  Warning: --enable-zlib-uncompress is incompatible with --disable-zlib."
+    fi
+    enable_zlib_uncompress="no"
 fi
 
 AM_CONDITIONAL(BUILD_ZLIB, test x$enable_zlib = xyes)
 AH_TEMPLATE([ENABLE_ZLIB],
-	    [Use zlib instead of builtin zlib decoder.])
+	    [Build against zlib.])
+AM_CONDITIONAL(BUILD_ZLIB_UNCOMPRESS, test x$enable_zlib_uncompress = xyes)
+AH_TEMPLATE([ENABLE_ZLIB_UNCOMPRESS],
+	    [Use zlib instead of builtin zlib decoder to uncompress flate streams.])
 
 dnl Test for libcurl
 AC_ARG_ENABLE(libcurl,
@@ -735,20 +772,20 @@ if test x$enable_poppler_qt5 = xyes; then
   AC_CHECK_TOOL(MOCQT5, moc)
   AC_MSG_CHECKING([for Qt5 moc])
   mocversion=`$MOCQT5 -v 2>&1`
-  mocversiongrep=`echo $mocversion | grep "Qt 5\|moc 5"`
+  mocversiongrep=`echo $mocversion | grep -E "Qt 5|moc 5"`
   if test x"$mocversiongrep" != x"$mocversion"; then
     AC_MSG_RESULT([no])
     # moc was not the qt5 one, try with moc-qt5
     AC_CHECK_TOOL(MOCQT52, moc-qt5)
     AC_MSG_CHECKING([for Qt5 moc-qt5])
     mocversion=`$MOCQT52 -v 2>&1`
-    mocversiongrep=`echo $mocversion | grep "Qt 5\|moc-qt5 5\|moc 5"`
+    mocversiongrep=`echo $mocversion | grep -E "Qt 5|moc-qt5 5|moc 5"`
     if test x"$mocversiongrep" != x"$mocversion"; then
       AC_CHECK_TOOL(QTCHOOSER, qtchooser)
       AC_MSG_CHECKING([for qtchooser])
       qt5tooldir=`QT_SELECT=qt5 qtchooser -print-env | grep QTTOOLDIR | cut -d '=' -f 2 | cut -d \" -f 2`
       mocversion=`$qt5tooldir/moc -v 2>&1`
-      mocversiongrep=`echo $mocversion | grep "Qt 5\|moc 5"`
+      mocversiongrep=`echo $mocversion | grep -E "Qt 5|moc 5"`
       if test x"$mocversiongrep" != x"$mocversion"; then
         # no valid moc found
         enable_poppler_qt5=no;
@@ -920,8 +957,8 @@ case "$enable_compile_warnings" in
 esac
 
 case "$host_os" in
-  mingw*)
-    # mingw prints "warning: -fPIC ignored for target (all code is position independent)"
+  mingw*|cygwin*)
+    # mingw and cygwin print "warning: -fPIC ignored for target (all code is position independent)"
     # for every file
     ;;
   *)
@@ -989,24 +1026,26 @@ poppler-cpp-uninstalled.pc])
 
 echo ""
 echo "Building poppler with support for:"
-echo "  font configuration: $with_font_configuration"
-echo "  splash output:      $enable_splash_output"
+echo "  font configuration:  $with_font_configuration"
+echo "  splash output:       $enable_splash_output"
 if test x$enable_cmyk = xyes;then
         echo "      with CMYK support"
 fi
-echo "  cairo output:       $use_cairo"
-echo "  qt4 wrapper:        $enable_poppler_qt4"
-echo "  qt5 wrapper:        $enable_poppler_qt5"
-echo "  glib wrapper:       $use_glib"
-echo "    introspection:    $found_introspection"
-echo "  cpp wrapper:        $enable_poppler_cpp"
-echo "  use gtk-doc:        $enable_gtk_doc"
-echo "  use libjpeg:        $enable_libjpeg"
-echo "  use libpng:         $enable_libpng"
-echo "  use libtiff:        $enable_libtiff"
-echo "  use zlib:           $enable_zlib"
-echo "  use libcurl:        $enable_libcurl"
-echo "  use libopenjpeg:    $enable_libopenjpeg"
+echo "  cairo output:        $use_cairo"
+echo "  qt4 wrapper:         $enable_poppler_qt4"
+echo "  qt5 wrapper:         $enable_poppler_qt5"
+echo "  glib wrapper:        $use_glib"
+echo "    introspection:     $found_introspection"
+echo "  cpp wrapper:         $enable_poppler_cpp"
+echo "  use gtk-doc:         $enable_gtk_doc"
+echo "  use libjpeg:         $enable_libjpeg"
+echo "  use libpng:          $enable_libpng"
+echo "  use libtiff:         $enable_libtiff"
+echo "  use zlib compress:   $enable_zlib"
+echo "  use zlib uncompress: $enable_zlib_uncompress"
+echo "  use nss:             $enable_nss"
+echo "  use libcurl:         $enable_libcurl"
+echo "  use libopenjpeg:     $enable_libopenjpeg"
 if test x$enable_libopenjpeg = xyes;then
     if test x$openjpeg1 = xyes;then
         echo "      with openjpeg1"
@@ -1014,7 +1053,7 @@ if test x$enable_libopenjpeg = xyes;then
         echo "      with openjpeg2"
     fi
 fi
-echo "  use cms:            $enable_cms"
+echo "  use cms:             $enable_cms"
 if test x$enable_cms = xyes;then
     if test x$lcms1 = xyes;then
         echo "      with lcms1"
@@ -1023,10 +1062,10 @@ if test x$enable_cms = xyes;then
     fi
 fi
 if test x$enable_build_type != xno;then
-        echo "  build type:         $enable_build_type"
+        echo "  build type:          $enable_build_type"
 fi
-echo "  command line utils: $enable_utils"
-echo "  test data dir:      $TESTDATADIR"
+echo "  command line utils:  $enable_utils"
+echo "  test data dir:       $TESTDATADIR"
 echo ""
 
 if test x$enable_splash_output = xno -a x$enable_cairo_output = xno; then
@@ -1038,13 +1077,13 @@ if test x$enable_single_precision = xyes -a x$enable_fixedpoint = xyes; then
 fi
 
 if test x$enable_libjpeg != xyes; then
-	echo "  Warning: Using libjpeg is recommended"
+	echo "  Warning: Using libjpeg is recommended. The internal DCT decoder is unmaintained."
 fi
 
-if test x$enable_zlib != xno; then
-	echo "  Warning: Using zlib is not totally safe"
+if test x$enable_zlib_uncompress != xno; then
+	echo "  Warning: Using zlib for decompression is not totally safe"
 fi
 
 if test x$enable_libopenjpeg != xyes; then
-	echo "  Warning: Using libopenjpeg is recommended"
+	echo "  Warning: Using libopenjpeg is recommended. The internal JPX decoder is unmaintained."
 fi
