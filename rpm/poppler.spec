@@ -1,11 +1,11 @@
 # spec file for package poppler
 
-%define poppler_soname 55
+%define poppler_soname 63
 %define poppler_glib_soname 8
 %define poppler_qt5_soname 1
 
 Name:           poppler
-Version:        0.36.0
+Version:        0.47.0
 Release:        1
 License:        GPLv2
 Summary:        PDF rendering library
@@ -19,6 +19,8 @@ BuildRequires:  libjpeg-devel
 BuildRequires:  libtool
 BuildRequires:  pkgconfig(cairo)
 BuildRequires:  pkgconfig(glib-2.0)
+BuildRequires:  pkgconfig(gobject-introspection-1.0)
+BuildRequires:  pkgconfig(nss)
 BuildRequires:  pkgconfig(libcurl)
 BuildRequires:  pkgconfig(libpng)
 BuildRequires:  pkgconfig(libxml-2.0)
@@ -175,12 +177,14 @@ find . -type f -o -type l | grep -v qt | xargs rm -v
 %files glib
 %defattr(-,root,root,-)
 %{_libdir}/libpoppler-glib.so.%{poppler_glib_soname}*
+%{_libdir}/girepository-1.0/Poppler-*.typelib
 
 %files glib-devel
 %defattr(-,root,root,-)
 %{_libdir}/pkgconfig/poppler-glib.pc
 %{_libdir}/pkgconfig/poppler-cairo.pc
 %{_libdir}/libpoppler-glib.so
+%{_datadir}/gir-1.0/Poppler-*.gir
 
 %files utils
 %defattr(-,root,root,-)
@@ -195,6 +199,7 @@ find . -type f -o -type l | grep -v qt | xargs rm -v
 %{_bindir}/pdfseparate
 %{_bindir}/pdftocairo
 %{_bindir}/pdfunite
+%{_bindir}/pdfsig
 %{_mandir}/man1/pdffonts.*
 %{_mandir}/man1/pdfimages.*
 %{_mandir}/man1/pdfinfo.*
@@ -206,3 +211,4 @@ find . -type f -o -type l | grep -v qt | xargs rm -v
 %{_mandir}/man1/pdfseparate.1.gz
 %{_mandir}/man1/pdftocairo.1.gz
 %{_mandir}/man1/pdfunite.1.gz
+%{_mandir}/man1/pdfsig.1.gz
