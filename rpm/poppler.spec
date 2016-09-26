@@ -161,12 +161,13 @@ find . -type f -o -type l | grep -v qt | xargs rm -v
 
 %files
 %defattr(-,root,root,-)
-%doc COPYING README
+%doc COPYING
 %{_libdir}/libpoppler-cpp.so.*
 %{_libdir}/libpoppler.so.%{poppler_soname}*
 
 %files devel
 %defattr(-,root,root,-)
+%doc README
 %{_libdir}/pkgconfig/poppler.pc
 %{_libdir}/pkgconfig/poppler-cpp.pc
 %{_libdir}/pkgconfig/poppler-splash.pc
