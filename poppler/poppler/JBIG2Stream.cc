@@ -15,7 +15,7 @@
 //
 // Copyright (C) 2006 Raj Kumar <rkumar@archive.org>
 // Copyright (C) 2006 Paul Walmsley <paul@booyaka.com>
-// Copyright (C) 2006-2010, 2012, 2014 Albert Astals Cid <aacid@kde.org>
+// Copyright (C) 2006-2010, 2012, 2014-2016 Albert Astals Cid <aacid@kde.org>
 // Copyright (C) 2009 David Benjamin <davidben@mit.edu>
 // Copyright (C) 2011 Edward Jiang <ejiang@google.com>
 // Copyright (C) 2012 William Bader <williambader@hotmail.com>
@@ -2701,8 +2701,13 @@ void JBIG2Stream::readHalftoneRegionSeg(Guint segNum, GBool imm,
       i >>= 1;
     }
   }
-  patW = patternDict->getBitmap(0)->getWidth();
-  patH = patternDict->getBitmap(0)->getHeight();
+  patternBitmap = patternDict->getBitmap(0);
+  if (unlikely(patternBitmap == NULL)) {
+    error(errSyntaxError, curStr->getPos(), "Bad pattern bitmap");
+    return;
+  }
+  patW = patternBitmap->getWidth();
+  patH = patternBitmap->getHeight();
 
   // set up the arithmetic decoder
   if (!mmr) {
@@ -2765,6 +2770,9 @@ void JBIG2Stream::readHalftoneRegionSeg(Guint segNum, GBool imm,
       if (!(enableSkip && skipBitmap->getPixel(n, m))) {
 	patternBitmap = patternDict->getBitmap(grayImg[i]);
 	if (unlikely(patternBitmap == NULL)) {
+	  delete skipBitmap;
+	  delete bitmap;
+	  gfree(grayImg);
 	  error(errSyntaxError, curStr->getPos(), "Bad pattern bitmap");
 	  return;
 	}
