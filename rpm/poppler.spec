@@ -7,7 +7,7 @@
 Name:           poppler
 Version:        0.47.0
 Release:        1
-License:        GPLv2
+License:        (GPLv2 or GPLv3) and GPLv2+ and LGPLv2+ and MIT
 Summary:        PDF rendering library
 Url:            http://poppler.freedesktop.org/
 Group:          System/Libraries
