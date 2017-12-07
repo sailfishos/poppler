@@ -108,7 +108,7 @@ pdftohtml (PDF to HTML converter), pdftotext (PDF to text converter),
 and pdffonts (PDF font analyzer).
 
 %prep
-%setup -q -n %{name}-%{version}/poppler
+%setup -q -n %{name}-%{version}/upstream
 
 # note: cms doesn't do anything until lcms2 is packaged and build required
 %build
