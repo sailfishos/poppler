@@ -1,22 +1,21 @@
 # spec file for package poppler
 
-%define poppler_soname 63
+%define poppler_soname 73
 %define poppler_glib_soname 8
 %define poppler_qt5_soname 1
 
 Name:           poppler
-Version:        0.47.0
+Version:        0.62.0
 Release:        1
 License:        (GPLv2 or GPLv3) and GPLv2+ and LGPLv2+ and MIT
 Summary:        PDF rendering library
 Url:            http://poppler.freedesktop.org/
 Group:          System/Libraries
 Source0:        http://poppler.freedesktop.org/%{name}-%{version}.tar.gz
-BuildRequires:  automake
+BuildRequires:  cmake
 BuildRequires:  gettext
 BuildRequires:  gcc-c++
 BuildRequires:  libjpeg-devel
-BuildRequires:  libtool
 BuildRequires:  pkgconfig(cairo)
 BuildRequires:  pkgconfig(glib-2.0)
 BuildRequires:  pkgconfig(gobject-introspection-1.0)
@@ -30,6 +29,8 @@ BuildRequires:  pkgconfig(Qt5Gui)
 BuildRequires:  pkgconfig(Qt5Xml)
 BuildRequires:  pkgconfig(Qt5Widgets)
 BuildRequires:  pkgconfig(Qt5Test)
+
+Patch1: 0001-Honor-configuration-for-building-glibc-copy-of-strto.patch
 
 %description
 Poppler is a PDF rendering library based on xpdf PDF viewer.
@@ -108,32 +109,15 @@ pdftohtml (PDF to HTML converter), pdftotext (PDF to text converter),
 and pdffonts (PDF font analyzer).
 
 %prep
-%setup -q -n %{name}-%{version}/poppler
+%setup -q -n %{name}-%{version}/upstream
+%patch1 -p1
 
-# note: cms doesn't do anything until lcms2 is packaged and build required
 %build
-autoreconf -vfi %configure \
-  --enable-shared \
-  --disable-static \
-  --enable-xpdf-headers \
-  --disable-libopenjpeg \
-  --enable-zlib \
-  --enable-libcurl \
-  --enable-libjpeg \
-  --enable-libpng \
-  --enable-splash-output \
-  --enable-cairo-output \
-  --enable-poppler-glib \
-  --enable-poppler-cpp \
-  --disable-gtk-test \
-  --enable-utils \
-  --enable-cms \
-  --enable-poppler-qt5
-
+cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR:PATH=/usr/lib -DENABLE_LIBOPENJPEG=none .
 make %{?_smp_mflags}
 
 %install
-%makeinstall
+%makeinstall DESTDIR=$RPM_BUILD_ROOT
 rm -f %{buildroot}%{_libdir}/*.la
 %if 0%{?build_with_qt5}
 cd %{buildroot}
