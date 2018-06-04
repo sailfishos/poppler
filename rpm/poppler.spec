@@ -21,6 +21,7 @@ BuildRequires:  pkgconfig(glib-2.0)
 BuildRequires:  pkgconfig(gobject-introspection-1.0)
 BuildRequires:  pkgconfig(nss)
 BuildRequires:  pkgconfig(libcurl)
+BuildRequires:  pkgconfig(libopenjp2)
 BuildRequires:  pkgconfig(libpng)
 BuildRequires:  pkgconfig(libxml-2.0)
 BuildRequires:  pkgconfig(zlib)
@@ -113,7 +114,7 @@ and pdffonts (PDF font analyzer).
 %patch1 -p1
 
 %build
-cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR:PATH=/usr/lib -DENABLE_LIBOPENJPEG=none .
+cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR:PATH=/usr/lib .
 make %{?_smp_mflags}
 
 %install
