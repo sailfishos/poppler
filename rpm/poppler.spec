@@ -1,11 +1,5 @@
-# spec file for package poppler
-
-%define poppler_soname 76
-%define poppler_glib_soname 8
-%define poppler_qt5_soname 1
-
 Name:           poppler
-Version:        0.65.0
+Version:        0.74.0
 Release:        1
 License:        (GPLv2 or GPLv3) and GPLv2+ and LGPLv2+ and MIT
 Summary:        PDF rendering library
@@ -31,8 +25,6 @@ BuildRequires:  pkgconfig(Qt5Xml)
 BuildRequires:  pkgconfig(Qt5Widgets)
 BuildRequires:  pkgconfig(Qt5Test)
 
-Patch1: 0001-Honor-configuration-for-building-glibc-copy-of-strto.patch
-
 %description
 Poppler is a PDF rendering library based on xpdf PDF viewer.
 
@@ -53,8 +45,8 @@ using the Qt 5 interface to Poppler.
 Summary:        PDF rendering library (Qt 5 interface development files)
 Group:          Development/Libraries
 Requires:       qt5-qtcore-devel qt5-qtgui-devel qt5-qttest-devel qt5-qtwidgets-devel qt5-qtxml-devel
-Requires:       poppler-devel = %{version}
-Requires:       poppler-qt5 = %{version}
+Requires:       poppler-devel = %{version}-%{release}
+Requires:       poppler-qt5 = %{version}-%{release}
 Obsoletes:      poppler-qt-devel
 
 %description qt5-devel
@@ -67,7 +59,7 @@ Summary:        PDF rendering library (development files)
 Group:          Development/Libraries
 Requires:       libjpeg-devel
 Requires:       pkgconfig
-Requires:       poppler = %{version}
+Requires:       poppler = %{version}-%{release}
 
 %description devel
 Poppler is a PDF rendering library based on xpdf PDF viewer.
@@ -78,7 +70,7 @@ build applications using Poppler.
 %package glib
 Summary:        PDF rendering library (GLib-based shared library)
 Group:          System/Libraries
-Requires:       poppler = %{version}
+Requires:       poppler = %{version}-%{release}
 
 %description glib
 Poppler is a PDF rendering library based on xpdf PDF viewer.
@@ -90,8 +82,8 @@ using the GLib interface to Poppler.
 Summary:        PDF rendering library (GLib interface development files)
 Group:          Development/Libraries
 Requires:       glib2-devel
-Requires:       poppler-devel = %{version}
-Requires:       poppler-glib = %{version}
+Requires:       poppler-devel = %{version}-%{release}
+Requires:       poppler-glib = %{version}-%{release}
 
 %description glib-devel
 Poppler is a PDF rendering library based on xpdf PDF viewer.
@@ -111,7 +103,6 @@ and pdffonts (PDF font analyzer).
 
 %prep
 %setup -q -n %{name}-%{version}/upstream
-%patch1 -p1
 
 %build
 cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR:PATH=/usr/lib .
@@ -136,7 +127,7 @@ find . -type f -o -type l | grep -v qt | xargs rm -v
 
 %files qt5
 %defattr(-,root,root,-)
-%{_libdir}/libpoppler-qt5.so.%{poppler_qt5_soname}*
+%{_libdir}/libpoppler-qt5.so.*
 
 %files qt5-devel
 %defattr(-,root,root,-)
@@ -146,9 +137,9 @@ find . -type f -o -type l | grep -v qt | xargs rm -v
 
 %files
 %defattr(-,root,root,-)
-%doc COPYING
+%license COPYING
 %{_libdir}/libpoppler-cpp.so.*
-%{_libdir}/libpoppler.so.%{poppler_soname}*
+%{_libdir}/libpoppler.so.*
 
 %files devel
 %defattr(-,root,root,-)
@@ -162,7 +153,7 @@ find . -type f -o -type l | grep -v qt | xargs rm -v
 
 %files glib
 %defattr(-,root,root,-)
-%{_libdir}/libpoppler-glib.so.%{poppler_glib_soname}*
+%{_libdir}/libpoppler-glib.so.*
 %{_libdir}/girepository-1.0/Poppler-*.typelib
 
 %files glib-devel
