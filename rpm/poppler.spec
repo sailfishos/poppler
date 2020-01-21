@@ -4,7 +4,6 @@ Release:        1
 License:        (GPLv2 or GPLv3) and GPLv2+ and LGPLv2+ and MIT
 Summary:        PDF rendering library
 Url:            http://poppler.freedesktop.org/
-Group:          System/Libraries
 Source0:        http://poppler.freedesktop.org/%{name}-%{version}.tar.gz
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -43,7 +42,6 @@ using the Qt 5 interface to Poppler.
 
 %package qt5-devel
 Summary:        PDF rendering library (Qt 5 interface development files)
-Group:          Development/Libraries
 Requires:       qt5-qtcore-devel qt5-qtgui-devel qt5-qttest-devel qt5-qtwidgets-devel qt5-qtxml-devel
 Requires:       poppler-devel = %{version}-%{release}
 Requires:       poppler-qt5 = %{version}-%{release}
@@ -56,7 +54,6 @@ This package provides a Qt 5 style interface to Poppler.
 
 %package devel
 Summary:        PDF rendering library (development files)
-Group:          Development/Libraries
 Requires:       libjpeg-devel
 Requires:       pkgconfig
 Requires:       poppler = %{version}-%{release}
@@ -69,7 +66,6 @@ build applications using Poppler.
 
 %package glib
 Summary:        PDF rendering library (GLib-based shared library)
-Group:          System/Libraries
 Requires:       poppler = %{version}-%{release}
 
 %description glib
@@ -80,7 +76,6 @@ using the GLib interface to Poppler.
 
 %package glib-devel
 Summary:        PDF rendering library (GLib interface development files)
-Group:          Development/Libraries
 Requires:       glib2-devel
 Requires:       poppler-devel = %{version}-%{release}
 Requires:       poppler-glib = %{version}-%{release}
@@ -92,7 +87,6 @@ This package provides a GLib-style interface to Poppler.
 
 %package utils
 Summary:        PDF utilitites (based on libpoppler)
-Group:          Applications/Text
 Requires:       poppler >= %{version}
 
 %description utils
