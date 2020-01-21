@@ -127,7 +127,7 @@ find . -type f -o -type l | grep -v qt | xargs rm -v
 %defattr(-,root,root,-)
 %{_libdir}/libpoppler-qt5.so
 %{_libdir}/pkgconfig/poppler-qt5.pc
-%{_includedir}/poppler/qt5/
+%{_includedir}/poppler/qt5
 
 %files
 %defattr(-,root,root,-)
@@ -143,7 +143,7 @@ find . -type f -o -type l | grep -v qt | xargs rm -v
 %{_libdir}/pkgconfig/poppler-splash.pc
 %{_libdir}/libpoppler.so
 %{_libdir}/libpoppler-cpp.so
-%{_includedir}/poppler/
+%{_includedir}/poppler
 
 %files glib
 %defattr(-,root,root,-)
