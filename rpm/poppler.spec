@@ -1,5 +1,5 @@
 Name:           poppler
-Version:        0.74.0
+Version:        0.84.0
 Release:        1
 License:        (GPLv2 or GPLv3) and GPLv2+ and LGPLv2+ and MIT
 Summary:        PDF rendering library
@@ -85,6 +85,13 @@ Poppler is a PDF rendering library based on xpdf PDF viewer.
 
 This package provides a GLib-style interface to Poppler.
 
+%package glib-doc
+Summary: Documentation for glib wrapper
+BuildArch: noarch
+
+%description glib-doc
+%{summary}.
+
 %package utils
 Summary:        PDF utilitites (based on libpoppler)
 Requires:       poppler >= %{version}
@@ -137,7 +144,6 @@ find . -type f -o -type l | grep -v qt | xargs rm -v
 
 %files devel
 %defattr(-,root,root,-)
-%doc README
 %{_libdir}/pkgconfig/poppler.pc
 %{_libdir}/pkgconfig/poppler-cpp.pc
 %{_libdir}/pkgconfig/poppler-splash.pc
@@ -157,29 +163,12 @@ find . -type f -o -type l | grep -v qt | xargs rm -v
 %{_libdir}/libpoppler-glib.so
 %{_datadir}/gir-1.0/Poppler-*.gir
 
+%files glib-doc
+%license COPYING
+%doc README.md
+%doc README.contributors
+
 %files utils
 %defattr(-,root,root,-)
-%{_bindir}/pdffonts
-%{_bindir}/pdfimages
-%{_bindir}/pdfinfo
-%{_bindir}/pdftohtml
-%{_bindir}/pdftoppm
-%{_bindir}/pdftops
-%{_bindir}/pdftotext
-%{_bindir}/pdfdetach
-%{_bindir}/pdfseparate
-%{_bindir}/pdftocairo
-%{_bindir}/pdfunite
-%{_bindir}/pdfsig
-%{_mandir}/man1/pdffonts.*
-%{_mandir}/man1/pdfimages.*
-%{_mandir}/man1/pdfinfo.*
-%{_mandir}/man1/pdftohtml.*
-%{_mandir}/man1/pdftoppm.*
-%{_mandir}/man1/pdftops.*
-%{_mandir}/man1/pdftotext.*
-%{_mandir}/man1/pdfdetach.1.gz
-%{_mandir}/man1/pdfseparate.1.gz
-%{_mandir}/man1/pdftocairo.1.gz
-%{_mandir}/man1/pdfunite.1.gz
-%{_mandir}/man1/pdfsig.1.gz
+%{_bindir}/pdf*
+%{_mandir}/man1/*
