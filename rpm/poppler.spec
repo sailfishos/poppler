@@ -6,6 +6,8 @@ Summary:        PDF rendering library
 Url:            http://poppler.freedesktop.org/
 Group:          System/Libraries
 Source0:        http://poppler.freedesktop.org/%{name}-%{version}.tar.gz
+Patch1:         0001-cairo-Constrain-number-of-cycles-in-rescale-filter.patch
+
 BuildRequires:  cmake
 BuildRequires:  gettext
 BuildRequires:  gcc-c++
@@ -103,6 +105,7 @@ and pdffonts (PDF font analyzer).
 
 %prep
 %setup -q -n %{name}-%{version}/upstream
+%patch1 -p1
 
 %build
 cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR:PATH=/usr/lib .
