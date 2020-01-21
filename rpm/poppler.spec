@@ -1,10 +1,9 @@
 Name:           poppler
-Version:        0.74.0
+Version:        0.84.0
 Release:        1
 License:        (GPLv2 or GPLv3) and GPLv2+ and LGPLv2+ and MIT
 Summary:        PDF rendering library
 Url:            http://poppler.freedesktop.org/
-Group:          System/Libraries
 Source0:        http://poppler.freedesktop.org/%{name}-%{version}.tar.gz
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -43,7 +42,6 @@ using the Qt 5 interface to Poppler.
 
 %package qt5-devel
 Summary:        PDF rendering library (Qt 5 interface development files)
-Group:          Development/Libraries
 Requires:       qt5-qtcore-devel qt5-qtgui-devel qt5-qttest-devel qt5-qtwidgets-devel qt5-qtxml-devel
 Requires:       poppler-devel = %{version}-%{release}
 Requires:       poppler-qt5 = %{version}-%{release}
@@ -56,7 +54,6 @@ This package provides a Qt 5 style interface to Poppler.
 
 %package devel
 Summary:        PDF rendering library (development files)
-Group:          Development/Libraries
 Requires:       libjpeg-devel
 Requires:       pkgconfig
 Requires:       poppler = %{version}-%{release}
@@ -69,7 +66,6 @@ build applications using Poppler.
 
 %package glib
 Summary:        PDF rendering library (GLib-based shared library)
-Group:          System/Libraries
 Requires:       poppler = %{version}-%{release}
 
 %description glib
@@ -80,7 +76,6 @@ using the GLib interface to Poppler.
 
 %package glib-devel
 Summary:        PDF rendering library (GLib interface development files)
-Group:          Development/Libraries
 Requires:       glib2-devel
 Requires:       poppler-devel = %{version}-%{release}
 Requires:       poppler-glib = %{version}-%{release}
@@ -90,9 +85,15 @@ Poppler is a PDF rendering library based on xpdf PDF viewer.
 
 This package provides a GLib-style interface to Poppler.
 
+%package glib-doc
+Summary: Documentation for glib wrapper
+BuildArch: noarch
+
+%description glib-doc
+%{summary}.
+
 %package utils
 Summary:        PDF utilitites (based on libpoppler)
-Group:          Applications/Text
 Requires:       poppler >= %{version}
 
 %description utils
@@ -133,7 +134,7 @@ find . -type f -o -type l | grep -v qt | xargs rm -v
 %defattr(-,root,root,-)
 %{_libdir}/libpoppler-qt5.so
 %{_libdir}/pkgconfig/poppler-qt5.pc
-%{_includedir}/poppler/qt5/
+%{_includedir}/poppler/qt5
 
 %files
 %defattr(-,root,root,-)
@@ -143,13 +144,12 @@ find . -type f -o -type l | grep -v qt | xargs rm -v
 
 %files devel
 %defattr(-,root,root,-)
-%doc README
 %{_libdir}/pkgconfig/poppler.pc
 %{_libdir}/pkgconfig/poppler-cpp.pc
 %{_libdir}/pkgconfig/poppler-splash.pc
 %{_libdir}/libpoppler.so
 %{_libdir}/libpoppler-cpp.so
-%{_includedir}/poppler/
+%{_includedir}/poppler
 
 %files glib
 %defattr(-,root,root,-)
@@ -163,29 +163,12 @@ find . -type f -o -type l | grep -v qt | xargs rm -v
 %{_libdir}/libpoppler-glib.so
 %{_datadir}/gir-1.0/Poppler-*.gir
 
+%files glib-doc
+%license COPYING
+%doc README.md
+%doc README.contributors
+
 %files utils
 %defattr(-,root,root,-)
-%{_bindir}/pdffonts
-%{_bindir}/pdfimages
-%{_bindir}/pdfinfo
-%{_bindir}/pdftohtml
-%{_bindir}/pdftoppm
-%{_bindir}/pdftops
-%{_bindir}/pdftotext
-%{_bindir}/pdfdetach
-%{_bindir}/pdfseparate
-%{_bindir}/pdftocairo
-%{_bindir}/pdfunite
-%{_bindir}/pdfsig
-%{_mandir}/man1/pdffonts.*
-%{_mandir}/man1/pdfimages.*
-%{_mandir}/man1/pdfinfo.*
-%{_mandir}/man1/pdftohtml.*
-%{_mandir}/man1/pdftoppm.*
-%{_mandir}/man1/pdftops.*
-%{_mandir}/man1/pdftotext.*
-%{_mandir}/man1/pdfdetach.1.gz
-%{_mandir}/man1/pdfseparate.1.gz
-%{_mandir}/man1/pdftocairo.1.gz
-%{_mandir}/man1/pdfunite.1.gz
-%{_mandir}/man1/pdfsig.1.gz
+%{_bindir}/pdf*
+%{_mandir}/man1/*
