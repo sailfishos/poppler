@@ -106,7 +106,7 @@ and pdffonts (PDF font analyzer).
 %setup -q -n %{name}-%{version}/upstream
 
 %build
-cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR:PATH=/usr/lib .
+cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR:PATH=%{_libdir} .
 make %{?_smp_mflags}
 
 %install
