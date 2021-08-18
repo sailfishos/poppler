@@ -1,5 +1,5 @@
 Name:           poppler
-Version:        0.84.0
+Version:        21.08.0
 Release:        1
 License:        (GPLv2 or GPLv3) and GPLv2+ and LGPLv2+ and MIT
 Summary:        PDF rendering library
@@ -23,6 +23,10 @@ BuildRequires:  pkgconfig(Qt5Gui)
 BuildRequires:  pkgconfig(Qt5Xml)
 BuildRequires:  pkgconfig(Qt5Widgets)
 BuildRequires:  pkgconfig(Qt5Test)
+BuildRequires:  pkgconfig(libtiff-4)
+BuildRequires:  boost-devel
+
+Patch1: 0001-Revert-Require-the-newer-qt5-provided-by-the-new-bas.patch
 
 %description
 Poppler is a PDF rendering library based on xpdf PDF viewer.
@@ -32,7 +36,6 @@ This package contains the shared library.
 %package qt5
 Summary:        PDF rendering library (Qt 5 based shared library)
 Requires:       poppler = %{version}
-Obsoletes:      poppler-qt
 
 %description qt5
 Poppler is a PDF rendering library based on xpdf PDF viewer.
@@ -45,7 +48,6 @@ Summary:        PDF rendering library (Qt 5 interface development files)
 Requires:       qt5-qtcore-devel qt5-qtgui-devel qt5-qttest-devel qt5-qtwidgets-devel qt5-qtxml-devel
 Requires:       poppler-devel = %{version}-%{release}
 Requires:       poppler-qt5 = %{version}-%{release}
-Obsoletes:      poppler-qt-devel
 
 %description qt5-devel
 Poppler is a PDF rendering library based on xpdf PDF viewer.
@@ -103,7 +105,7 @@ pdftohtml (PDF to HTML converter), pdftotext (PDF to text converter),
 and pdffonts (PDF font analyzer).
 
 %prep
-%setup -q -n %{name}-%{version}/upstream
+%autosetup -p1 -n %{name}-%{version}/upstream
 
 %build
 cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR:PATH=%{_libdir} .
@@ -146,7 +148,6 @@ find . -type f -o -type l | grep -v qt | xargs rm -v
 %defattr(-,root,root,-)
 %{_libdir}/pkgconfig/poppler.pc
 %{_libdir}/pkgconfig/poppler-cpp.pc
-%{_libdir}/pkgconfig/poppler-splash.pc
 %{_libdir}/libpoppler.so
 %{_libdir}/libpoppler-cpp.so
 %{_includedir}/poppler
@@ -159,7 +160,6 @@ find . -type f -o -type l | grep -v qt | xargs rm -v
 %files glib-devel
 %defattr(-,root,root,-)
 %{_libdir}/pkgconfig/poppler-glib.pc
-%{_libdir}/pkgconfig/poppler-cairo.pc
 %{_libdir}/libpoppler-glib.so
 %{_datadir}/gir-1.0/Poppler-*.gir
 
