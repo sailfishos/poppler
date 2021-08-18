@@ -87,13 +87,6 @@ Poppler is a PDF rendering library based on xpdf PDF viewer.
 
 This package provides a GLib-style interface to Poppler.
 
-%package glib-doc
-Summary: Documentation for glib wrapper
-BuildArch: noarch
-
-%description glib-doc
-%{summary}.
-
 %package utils
 Summary:        PDF utilitites (based on libpoppler)
 Requires:       poppler >= %{version}
@@ -162,11 +155,6 @@ find . -type f -o -type l | grep -v qt | xargs rm -v
 %{_libdir}/pkgconfig/poppler-glib.pc
 %{_libdir}/libpoppler-glib.so
 %{_datadir}/gir-1.0/Poppler-*.gir
-
-%files glib-doc
-%license COPYING
-%doc README.md
-%doc README.contributors
 
 %files utils
 %defattr(-,root,root,-)
