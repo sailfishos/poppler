@@ -8,7 +8,7 @@ Source0:        http://poppler.freedesktop.org/%{name}-%{version}.tar.gz
 BuildRequires:  cmake
 BuildRequires:  gettext
 BuildRequires:  gcc-c++
-BuildRequires:  libjpeg-devel
+BuildRequires:  pkgconfig(libjpeg)
 BuildRequires:  pkgconfig(cairo)
 BuildRequires:  pkgconfig(glib-2.0)
 BuildRequires:  pkgconfig(gobject-introspection-1.0)
@@ -56,8 +56,6 @@ This package provides a Qt 5 style interface to Poppler.
 
 %package devel
 Summary:        PDF rendering library (development files)
-Requires:       libjpeg-devel
-Requires:       pkgconfig
 Requires:       poppler = %{version}-%{release}
 
 %description devel
@@ -101,16 +99,12 @@ and pdffonts (PDF font analyzer).
 %autosetup -p1 -n %{name}-%{version}/upstream
 
 %build
-cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR:PATH=%{_libdir} .
-make %{?_smp_mflags}
+%cmake .
+%make_build
 
 %install
-%makeinstall DESTDIR=$RPM_BUILD_ROOT
+%make_install
 rm -f %{buildroot}%{_libdir}/*.la
-%if 0%{?build_with_qt5}
-cd %{buildroot}
-find . -type f -o -type l | grep -v qt | xargs rm -v
-%endif
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
