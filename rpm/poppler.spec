@@ -1,5 +1,5 @@
 Name:           poppler
-Version:        21.08.0
+Version:        22.09.0
 Release:        1
 License:        (GPLv2 or GPLv3) and GPLv2+ and LGPLv2+ and MIT
 Summary:        PDF rendering library
@@ -27,6 +27,7 @@ BuildRequires:  pkgconfig(libtiff-4)
 BuildRequires:  boost-devel
 
 Patch1: 0001-Revert-Require-the-newer-qt5-provided-by-the-new-bas.patch
+Patch2: 0002-Don-t-build-qt5-demos.patch
 
 %description
 Poppler is a PDF rendering library based on xpdf PDF viewer.
