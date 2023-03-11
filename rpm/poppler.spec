@@ -1,11 +1,12 @@
 Name:           poppler
-Version:        22.09.0
+Version:        23.07.0
 Release:        1
 License:        (GPLv2 or GPLv3) and GPLv2+ and LGPLv2+ and MIT
 Summary:        PDF rendering library
 Url:            http://poppler.freedesktop.org/
 Source0:        http://poppler.freedesktop.org/%{name}-%{version}.tar.gz
 BuildRequires:  cmake
+BuildRequires:  ninja
 BuildRequires:  gettext
 BuildRequires:  gcc-c++
 BuildRequires:  pkgconfig(libjpeg)
@@ -24,10 +25,10 @@ BuildRequires:  pkgconfig(Qt5Xml)
 BuildRequires:  pkgconfig(Qt5Widgets)
 BuildRequires:  pkgconfig(Qt5Test)
 BuildRequires:  pkgconfig(libtiff-4)
-BuildRequires:  boost-devel
+BuildRequires:  boost-devel >= 1.71.0
 
 Patch1: 0001-Revert-Require-the-newer-qt5-provided-by-the-new-bas.patch
-Patch2: 0002-Don-t-build-qt5-demos.patch
+Patch2: 0002-Don-t-build-qt5-demos-tests.patch
 
 %description
 Poppler is a PDF rendering library based on xpdf PDF viewer.
@@ -100,11 +101,11 @@ and pdffonts (PDF font analyzer).
 %autosetup -p1 -n %{name}-%{version}/upstream
 
 %build
-%cmake .
-%make_build
+%cmake . -G Ninja -DENABLE_BOOST=ON
+%ninja_build
 
 %install
-%make_install
+%ninja_install
 rm -f %{buildroot}%{_libdir}/*.la
 
 %post -p /sbin/ldconfig
