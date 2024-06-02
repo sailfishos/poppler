@@ -1,5 +1,5 @@
 Name:           poppler
-Version:        23.07.0
+Version:        24.08.0
 Release:        1
 License:        (GPLv2 or GPLv3) and GPLv2+ and LGPLv2+ and MIT
 Summary:        PDF rendering library
@@ -27,8 +27,9 @@ BuildRequires:  pkgconfig(Qt5Test)
 BuildRequires:  pkgconfig(libtiff-4)
 BuildRequires:  boost-devel >= 1.71.0
 
-Patch1: 0001-Revert-Require-the-newer-qt5-provided-by-the-new-bas.patch
-Patch2: 0002-Don-t-build-qt5-demos-tests.patch
+Patch1: 0001-Revert-Async-api-for-certificate-validation.patch
+Patch2: 0002-Revert-Require-the-newer-qt5-provided-by-the-new-bas.patch
+Patch3: 0003-Don-t-build-qt5-demos-tests.patch
 
 %description
 Poppler is a PDF rendering library based on xpdf PDF viewer.
@@ -101,7 +102,7 @@ and pdffonts (PDF font analyzer).
 %autosetup -p1 -n %{name}-%{version}/upstream
 
 %build
-%cmake . -G Ninja -DENABLE_BOOST=ON
+%cmake . -G Ninja -DENABLE_BOOST=ON -DENABLE_GPGME=off -DENABLE_QT6=off -DENABLE_LCMS=off
 %ninja_build
 
 %install
@@ -156,3 +157,6 @@ rm -f %{buildroot}%{_libdir}/*.la
 %defattr(-,root,root,-)
 %{_bindir}/pdf*
 %{_mandir}/man1/*
+
+%exclude %{_datarootdir}/locale/ca/LC_MESSAGES/pdfsig.mo
+
