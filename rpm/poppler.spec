@@ -3,8 +3,8 @@ Version:        24.08.0
 Release:        1
 License:        (GPLv2 or GPLv3) and GPLv2+ and LGPLv2+ and MIT
 Summary:        PDF rendering library
-Url:            http://poppler.freedesktop.org/
-Source0:        http://poppler.freedesktop.org/%{name}-%{version}.tar.gz
+Url:            https://poppler.freedesktop.org/
+Source0:        https://poppler.freedesktop.org/%{name}-%{version}.tar.gz
 BuildRequires:  cmake
 BuildRequires:  ninja
 BuildRequires:  gettext
@@ -102,11 +102,12 @@ and pdffonts (PDF font analyzer).
 %autosetup -p1 -n %{name}-%{version}/upstream
 
 %build
-%cmake . -G Ninja -DENABLE_BOOST=ON -DENABLE_GPGME=off -DENABLE_QT6=off -DENABLE_LCMS=off
-%ninja_build
+%cmake . -G Ninja -DENABLE_BOOST=ON -DENABLE_GPGME=off -DENABLE_QT6=off -DENABLE_LCMS=off \
+   -DENABLE_UNSTABLE_API_ABI_HEADERS=ON
+%cmake_build
 
 %install
-%ninja_install
+%cmake_install
 rm -f %{buildroot}%{_libdir}/*.la
 
 %post -p /sbin/ldconfig
@@ -119,42 +120,38 @@ rm -f %{buildroot}%{_libdir}/*.la
 %postun glib -p /sbin/ldconfig
 
 %files qt5
-%defattr(-,root,root,-)
 %{_libdir}/libpoppler-qt5.so.*
 
 %files qt5-devel
-%defattr(-,root,root,-)
 %{_libdir}/libpoppler-qt5.so
 %{_libdir}/pkgconfig/poppler-qt5.pc
-%{_includedir}/poppler/qt5
+%{_includedir}/poppler/qt5/
 
 %files
-%defattr(-,root,root,-)
 %license COPYING
 %{_libdir}/libpoppler-cpp.so.*
 %{_libdir}/libpoppler.so.*
 
 %files devel
-%defattr(-,root,root,-)
 %{_libdir}/pkgconfig/poppler.pc
 %{_libdir}/pkgconfig/poppler-cpp.pc
 %{_libdir}/libpoppler.so
 %{_libdir}/libpoppler-cpp.so
-%{_includedir}/poppler
+%{_includedir}/poppler/
+%exclude %{_includedir}/poppler/qt5
+%exclude %{_includedir}/poppler/glib
 
 %files glib
-%defattr(-,root,root,-)
 %{_libdir}/libpoppler-glib.so.*
 %{_libdir}/girepository-1.0/Poppler-*.typelib
 
 %files glib-devel
-%defattr(-,root,root,-)
 %{_libdir}/pkgconfig/poppler-glib.pc
 %{_libdir}/libpoppler-glib.so
 %{_datadir}/gir-1.0/Poppler-*.gir
+%{_includedir}/poppler/glib/
 
 %files utils
-%defattr(-,root,root,-)
 %{_bindir}/pdf*
 %{_mandir}/man1/*
 
