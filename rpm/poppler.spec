@@ -1,10 +1,10 @@
 Name:           poppler
-Version:        24.08.0
+Version:        25.04.0
 Release:        1
 License:        (GPLv2 or GPLv3) and GPLv2+ and LGPLv2+ and MIT
 Summary:        PDF rendering library
-Url:            https://poppler.freedesktop.org/
-Source0:        https://poppler.freedesktop.org/%{name}-%{version}.tar.gz
+Url:            https://github.com/sailfishos/poppler
+Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  cmake
 BuildRequires:  ninja
 BuildRequires:  gettext
@@ -27,9 +27,9 @@ BuildRequires:  pkgconfig(Qt5Test)
 BuildRequires:  pkgconfig(libtiff-4)
 BuildRequires:  boost-devel >= 1.71.0
 
-Patch1: 0001-Revert-Async-api-for-certificate-validation.patch
-Patch2: 0002-Revert-Require-the-newer-qt5-provided-by-the-new-bas.patch
-Patch3: 0003-Don-t-build-qt5-demos-tests.patch
+Patch1: 0001-Revert-Require-the-newer-qt5-provided-by-the-new-bas.patch
+Patch2: 0002-Don-t-build-qt5-demos-tests.patch
+Patch3: 0003-Revert-Remove-QT_VERSION_CHECK-that-are-always-true.patch
 
 %description
 Poppler is a PDF rendering library based on xpdf PDF viewer.
