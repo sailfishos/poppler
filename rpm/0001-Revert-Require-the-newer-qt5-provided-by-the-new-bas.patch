@@ -13,7 +13,7 @@ This reverts commit 0b34c18882ee3920c5ab9e9b953b3bb642f1b198.
  5 files changed, 16 insertions(+), 8 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index a5a478ac4c080779aac3ece4180be32e3b81f3b7..a4b14da57371cd4bf2874192f655a72040d7b701 100644
+index 81f5ed623268af882a258f4f3f4b27a4f2cff208..a5ea82b8bd6aaffe253ff6c8625062b6f0a1578e 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -211,7 +211,7 @@ else()
@@ -39,10 +39,10 @@ index 431d2d357100d9f7d056704e55164df1148d5749..58b42f5e716f7b09ec1c3b57b7294021
  
  add_subdirectory(src)
 diff --git a/qt5/src/poppler-annotation.cc b/qt5/src/poppler-annotation.cc
-index 817951e6fd158b5def12a5af9bd6759bcb777e83..e0a3cbde60a8953dfa0163d5f80bb1d0736ee8d6 100644
+index ca2750c65cbfcdb40dd54e219a6a7659ca3562d3..5b07220eaa670058ee448450295e88228291a8e1 100644
 --- a/qt5/src/poppler-annotation.cc
 +++ b/qt5/src/poppler-annotation.cc
-@@ -1515,7 +1515,7 @@ void Annotation::setModificationDate(const QDateTime &date)
+@@ -1505,7 +1505,7 @@ void Annotation::setModificationDate(const QDateTime &date)
  
      if (d->pdfAnnot) {
          if (date.isValid()) {
@@ -51,8 +51,8 @@ index 817951e6fd158b5def12a5af9bd6759bcb777e83..e0a3cbde60a8953dfa0163d5f80bb1d0
              std::unique_ptr<GooString> s = timeToDateString(&t);
              d->pdfAnnot->setModified(std::move(s));
          } else {
-@@ -1553,7 +1553,7 @@ void Annotation::setCreationDate(const QDateTime &date)
-     AnnotMarkup *markupann = dynamic_cast<AnnotMarkup *>(d->pdfAnnot);
+@@ -1543,7 +1543,7 @@ void Annotation::setCreationDate(const QDateTime &date)
+     AnnotMarkup *markupann = dynamic_cast<AnnotMarkup *>(d->pdfAnnot.get());
      if (markupann) {
          if (date.isValid()) {
 -            const time_t t = date.toSecsSinceEpoch();
@@ -61,11 +61,11 @@ index 817951e6fd158b5def12a5af9bd6759bcb777e83..e0a3cbde60a8953dfa0163d5f80bb1d0
              markupann->setDate(std::move(s));
          } else {
 diff --git a/qt5/src/poppler-form.cc b/qt5/src/poppler-form.cc
-index 728025319b2b3bb3e889ef87a7173119a84159e1..dc11d58fc43a4744c7e7e69bca6e58b8d0323925 100644
+index a3e968fa8f8ebd5368b30f0ca49408c7a611c16f..840733c181727849d49ffa7511bf16dd01323b5f 100644
 --- a/qt5/src/poppler-form.cc
 +++ b/qt5/src/poppler-form.cc
 @@ -1053,8 +1053,8 @@ static CertificateInfoPrivate *createCertificateInfoPrivate(const X509Certificat
-         certPriv->nick_name = ci->getNickName().c_str();
+         certPriv->nick_name = QString::fromStdString(ci->getNickName().toStr());
  
          X509CertificateInfo::Validity certValidity = ci->getValidity();
 -        certPriv->validity_start = QDateTime::fromSecsSinceEpoch(certValidity.notBefore, QTimeZone::utc());
@@ -91,7 +91,7 @@ index 728025319b2b3bb3e889ef87a7173119a84159e1..dc11d58fc43a4744c7e7e69bca6e58b8
 +#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
                                                                      [innerObj = std::weak_ptr<AsyncObject>(l)]() {
                                                                          if (auto innerLocked = innerObj.lock()) {
-                                                                             emit innerLocked->done();
+                                                                             Q_EMIT innerLocked->done();
                                                                          }
                                                                      },
 +#else
@@ -101,7 +101,7 @@ index 728025319b2b3bb3e889ef87a7173119a84159e1..dc11d58fc43a4744c7e7e69bca6e58b8
                                                          }
                                                      });
 diff --git a/qt5/tests/poppler-forms.cpp b/qt5/tests/poppler-forms.cpp
-index 8d927e84f47c0114066cad02dfaba5045719f934..fd9af9c2dd04fb52a0d56521b2687eb513c641b2 100644
+index 8e6f008e2de8603ad81e64651bf1dac518b437eb..7621d59b06ddc8f1ae1bd8c85ef6621393d91754 100644
 --- a/qt5/tests/poppler-forms.cpp
 +++ b/qt5/tests/poppler-forms.cpp
 @@ -264,7 +264,11 @@ int main(int argc, char **argv)
