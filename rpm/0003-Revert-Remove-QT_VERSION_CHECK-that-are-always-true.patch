@@ -9,10 +9,10 @@ This reverts commit 18885fcc7398ddaa0769a2ae7acad46d32db02f9.
  1 file changed, 10 insertions(+)
 
 diff --git a/qt5/src/poppler-annotation.cc b/qt5/src/poppler-annotation.cc
-index e0a3cbde60a8953dfa0163d5f80bb1d0736ee8d6..81b0c6c67d2ff699b9f635a4f47efe4ab28420ab 100644
+index 5b07220eaa670058ee448450295e88228291a8e1..5dee4786864defc619463a48320ecdad3373fa17 100644
 --- a/qt5/src/poppler-annotation.cc
 +++ b/qt5/src/poppler-annotation.cc
-@@ -172,7 +172,11 @@ void getRawDataFromQImage(const QImage &qimg, int bitsPerPixel, QByteArray *data
+@@ -178,7 +178,11 @@ void getRawDataFromQImage(const QImage &qimg, int bitsPerPixel, QByteArray *data
          break;
      case 8:
      case 24:
@@ -24,7 +24,7 @@ index e0a3cbde60a8953dfa0163d5f80bb1d0736ee8d6..81b0c6c67d2ff699b9f635a4f47efe4a
          break;
      case 32:
          for (int line = 0; line < height; line++) {
-@@ -1699,7 +1703,11 @@ Annotation::Style Annotation::style() const
+@@ -1689,7 +1693,11 @@ Annotation::Style Annotation::style() const
          s.setLineStyle((Annotation::LineStyle)(1 << border->getStyle()));
  
          const std::vector<double> &dashArray = border->getDash();
@@ -36,7 +36,7 @@ index e0a3cbde60a8953dfa0163d5f80bb1d0736ee8d6..81b0c6c67d2ff699b9f635a4f47efe4a
      }
  
      AnnotBorderEffect *border_effect;
-@@ -3489,12 +3497,14 @@ AnnotStampImageHelper *StampAnnotationPrivate::convertQImageToAnnotStampImageHel
+@@ -3468,12 +3476,14 @@ std::unique_ptr<AnnotStampImageHelper> StampAnnotationPrivate::convertQImageToAn
      case QImage::Format_Grayscale8:
          bitsPerComponent = 8;
          break;

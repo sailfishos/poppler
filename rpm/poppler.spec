@@ -1,5 +1,5 @@
 Name:           poppler
-Version:        25.04.0
+Version:        25.07.0
 Release:        1
 License:        (GPLv2 or GPLv3) and GPLv2+ and LGPLv2+ and MIT
 Summary:        PDF rendering library
