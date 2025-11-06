@@ -13,10 +13,10 @@ This reverts commit 0b34c18882ee3920c5ab9e9b953b3bb642f1b198.
  5 files changed, 16 insertions(+), 8 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 81f5ed623268af882a258f4f3f4b27a4f2cff208..a5ea82b8bd6aaffe253ff6c8625062b6f0a1578e 100644
+index f10f9b049d564a786543ccdb42bec2e508fd5e2b..f71841062b91d8e32a0d5386f7e7673800108693 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -211,7 +211,7 @@ else()
+@@ -216,7 +216,7 @@ else()
    message(FATAL_ERROR "Invalid ENABLE_DCTDECODER value.")
  endif()
  
@@ -39,7 +39,7 @@ index 431d2d357100d9f7d056704e55164df1148d5749..58b42f5e716f7b09ec1c3b57b7294021
  
  add_subdirectory(src)
 diff --git a/qt5/src/poppler-annotation.cc b/qt5/src/poppler-annotation.cc
-index ca2750c65cbfcdb40dd54e219a6a7659ca3562d3..5b07220eaa670058ee448450295e88228291a8e1 100644
+index 445a49c7710aca28a528a9a1e65c4ffc7a8449fa..15e1c9686dddbb34b923be9b03f22b50275adcf0 100644
 --- a/qt5/src/poppler-annotation.cc
 +++ b/qt5/src/poppler-annotation.cc
 @@ -1505,7 +1505,7 @@ void Annotation::setModificationDate(const QDateTime &date)
@@ -61,10 +61,10 @@ index ca2750c65cbfcdb40dd54e219a6a7659ca3562d3..5b07220eaa670058ee448450295e8822
              markupann->setDate(std::move(s));
          } else {
 diff --git a/qt5/src/poppler-form.cc b/qt5/src/poppler-form.cc
-index a3e968fa8f8ebd5368b30f0ca49408c7a611c16f..840733c181727849d49ffa7511bf16dd01323b5f 100644
+index 0879d59fc54066f7e16b4f46a594c817121b6dbd..6024cf357ec0e5e6d5a5e5408afc69ebacd2dd96 100644
 --- a/qt5/src/poppler-form.cc
 +++ b/qt5/src/poppler-form.cc
-@@ -1053,8 +1053,8 @@ static CertificateInfoPrivate *createCertificateInfoPrivate(const X509Certificat
+@@ -1054,8 +1054,8 @@ static CertificateInfoPrivate *createCertificateInfoPrivate(const X509Certificat
          certPriv->nick_name = QString::fromStdString(ci->getNickName().toStr());
  
          X509CertificateInfo::Validity certValidity = ci->getValidity();
@@ -74,8 +74,8 @@ index a3e968fa8f8ebd5368b30f0ca49408c7a611c16f..840733c181727849d49ffa7511bf16dd
 +        certPriv->validity_end = QDateTime::fromTime_t(certValidity.notAfter, Qt::UTC);
  
          const X509CertificateInfo::PublicKeyInfo &pkInfo = ci->getPublicKeyInfo();
-         certPriv->public_key = QByteArray(pkInfo.publicKey.c_str(), pkInfo.publicKey.getLength());
-@@ -1163,7 +1163,7 @@ std::pair<SignatureValidationInfo, std::shared_ptr<Poppler::AsyncObject>> FormFi
+         certPriv->public_key = QByteArray(pkInfo.publicKey.c_str(), pkInfo.publicKey.size());
+@@ -1165,7 +1165,7 @@ std::pair<SignatureValidationInfo, std::shared_ptr<Poppler::AsyncObject>> FormFi
  {
      auto object = std::make_shared<AsyncObject>();
      FormWidgetSignature *fws = static_cast<FormWidgetSignature *>(m_formData->fm);
@@ -84,7 +84,7 @@ index a3e968fa8f8ebd5368b30f0ca49408c7a611c16f..840733c181727849d49ffa7511bf16dd
      SignatureInfo *si = fws->validateSignatureAsync(opt & ValidateVerifyCertificate, opt & ValidateForceRevalidation, validationTimeT, !(opt & ValidateWithoutOCSPRevocationCheck), opt & ValidateUseAIACertFetch,
                                                      [obj = std::weak_ptr<AsyncObject>(object)]() {
                                                          if (auto l = obj.lock()) {
-@@ -1171,11 +1171,15 @@ std::pair<SignatureValidationInfo, std::shared_ptr<Poppler::AsyncObject>> FormFi
+@@ -1173,11 +1173,15 @@ std::pair<SignatureValidationInfo, std::shared_ptr<Poppler::AsyncObject>> FormFi
                                                              // to ensure callers have a chance of connecting to AsyncObject::done
                                                              QMetaObject::invokeMethod(
                                                                      l.get(),

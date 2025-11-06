@@ -9,7 +9,7 @@ This reverts commit 18885fcc7398ddaa0769a2ae7acad46d32db02f9.
  1 file changed, 10 insertions(+)
 
 diff --git a/qt5/src/poppler-annotation.cc b/qt5/src/poppler-annotation.cc
-index 5b07220eaa670058ee448450295e88228291a8e1..5dee4786864defc619463a48320ecdad3373fa17 100644
+index 15e1c9686dddbb34b923be9b03f22b50275adcf0..22160925e631df7e908d945a54fd7a4df0d7020d 100644
 --- a/qt5/src/poppler-annotation.cc
 +++ b/qt5/src/poppler-annotation.cc
 @@ -178,7 +178,11 @@ void getRawDataFromQImage(const QImage &qimg, int bitsPerPixel, QByteArray *data
