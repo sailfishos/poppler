@@ -8,7 +8,7 @@ Subject: [PATCH] Don't build qt5-demos/-tests
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/qt5/CMakeLists.txt b/qt5/CMakeLists.txt
-index 58b42f5e716f7b09ec1c3b57b7294021eb146678..ae4951eeac4ff53a46db8bb57b7e01254d550b38 100644
+index 58b42f5e..ae4951ee 100644
 --- a/qt5/CMakeLists.txt
 +++ b/qt5/CMakeLists.txt
 @@ -9,5 +9,5 @@ add_definitions(-DQT_DISABLE_DEPRECATED_BEFORE=0x050500)
