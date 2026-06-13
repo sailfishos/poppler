@@ -1,5 +1,5 @@
 Name:           poppler
-Version:        25.12.0
+Version:        26.10.0
 Release:        1
 License:        (GPLv2 or GPLv3) and GPLv2+ and LGPLv2+ and MIT
 Summary:        PDF rendering library
@@ -13,6 +13,7 @@ BuildRequires:  pkgconfig(libjpeg)
 BuildRequires:  pkgconfig(cairo)
 BuildRequires:  pkgconfig(glib-2.0)
 BuildRequires:  pkgconfig(gobject-introspection-1.0)
+BuildRequires:  pkgconfig(harfbuzz)
 BuildRequires:  pkgconfig(nss)
 BuildRequires:  pkgconfig(libcurl)
 BuildRequires:  pkgconfig(libopenjp2)
@@ -28,8 +29,7 @@ BuildRequires:  pkgconfig(libtiff-4)
 BuildRequires:  boost-devel >= 1.71.0
 
 Patch1: 0001-Revert-Require-the-newer-qt5-provided-by-the-new-bas.patch
-Patch2: 0002-Don-t-build-qt5-demos-tests.patch
-Patch3: 0003-Revert-Remove-QT_VERSION_CHECK-that-are-always-true.patch
+Patch2: 0002-Revert-Remove-QT_VERSION_CHECK-that-are-always-true.patch
 
 %description
 Poppler is a PDF rendering library based on xpdf PDF viewer.
@@ -102,8 +102,14 @@ and pdffonts (PDF font analyzer).
 %autosetup -p1 -n %{name}-%{version}/upstream
 
 %build
-%cmake . -G Ninja -DENABLE_BOOST=ON -DENABLE_GPGME=off -DENABLE_QT6=off -DENABLE_LCMS=off \
-   -DENABLE_UNSTABLE_API_ABI_HEADERS=ON
+%cmake . -G Ninja \
+  -DBUILD_QT5_TESTS=OFF \
+  -DENABLE_BOOST=ON \
+  -DENABLE_BROTLI=OFF \
+  -DENABLE_GPGME=OFF \
+  -DENABLE_QT6=OFF \
+  -DENABLE_LCMS=OFF \
+  -DENABLE_UNSTABLE_API_ABI_HEADERS=ON
 %cmake_build
 
 %install
