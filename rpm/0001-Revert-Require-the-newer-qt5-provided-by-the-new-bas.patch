@@ -13,18 +13,18 @@ This reverts commit 0b34c18882ee3920c5ab9e9b953b3bb642f1b198.
  5 files changed, 16 insertions(+), 8 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index f10f9b049d564a786543ccdb42bec2e508fd5e2b..f71841062b91d8e32a0d5386f7e7673800108693 100644
+index 1f5def1e52e8867aef47aa41758dcc1c85000470..a98557ec960e0897392b327a252330c9f2671c9f 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -216,7 +216,7 @@ else()
-   message(FATAL_ERROR "Invalid ENABLE_DCTDECODER value.")
- endif()
- 
+@@ -150,7 +150,7 @@ set(NSS3_VERSION "3.98")
+ set(GPGME_VERSION "1.19")
+ set(LCMS2_REQUIRED_VERSION "2.14")
+ set(TIFF_VERSION "4.5")
 -set(QT5_VERSION "5.15")
 +set(QT5_VERSION "5.6")
- find_soft_mandatory_package(ENABLE_QT5 Qt5Core ${QT5_VERSION})
- find_soft_mandatory_package(ENABLE_QT5 Qt5Gui ${QT5_VERSION})
- find_soft_mandatory_package(ENABLE_QT5 Qt5Xml ${QT5_VERSION})
+ set(QT6_VERSION "6.4")
+ set(BOOST_VERSION "1.83")
+ set(GOBJECT_INTROSPECTION_VERSION "1.80")
 diff --git a/qt5/CMakeLists.txt b/qt5/CMakeLists.txt
 index 431d2d357100d9f7d056704e55164df1148d5749..58b42f5e716f7b09ec1c3b57b7294021eb146678 100644
 --- a/qt5/CMakeLists.txt
@@ -39,10 +39,10 @@ index 431d2d357100d9f7d056704e55164df1148d5749..58b42f5e716f7b09ec1c3b57b7294021
  
  add_subdirectory(src)
 diff --git a/qt5/src/poppler-annotation.cc b/qt5/src/poppler-annotation.cc
-index 445a49c7710aca28a528a9a1e65c4ffc7a8449fa..15e1c9686dddbb34b923be9b03f22b50275adcf0 100644
+index aa2d10130ade445ebf9b750d834e66b16687317a..2aab7bd2a8a6cf148af2bc011ea1471fa6c5463f 100644
 --- a/qt5/src/poppler-annotation.cc
 +++ b/qt5/src/poppler-annotation.cc
-@@ -1505,7 +1505,7 @@ void Annotation::setModificationDate(const QDateTime &date)
+@@ -1496,7 +1496,7 @@ void Annotation::setModificationDate(const QDateTime &date)
  
      if (d->pdfAnnot) {
          if (date.isValid()) {
@@ -51,8 +51,8 @@ index 445a49c7710aca28a528a9a1e65c4ffc7a8449fa..15e1c9686dddbb34b923be9b03f22b50
              std::unique_ptr<GooString> s = timeToDateString(&t);
              d->pdfAnnot->setModified(std::move(s));
          } else {
-@@ -1543,7 +1543,7 @@ void Annotation::setCreationDate(const QDateTime &date)
-     AnnotMarkup *markupann = dynamic_cast<AnnotMarkup *>(d->pdfAnnot.get());
+@@ -1534,7 +1534,7 @@ void Annotation::setCreationDate(const QDateTime &date)
+     auto *markupann = dynamic_cast<AnnotMarkup *>(d->pdfAnnot.get());
      if (markupann) {
          if (date.isValid()) {
 -            const time_t t = date.toSecsSinceEpoch();
@@ -61,30 +61,30 @@ index 445a49c7710aca28a528a9a1e65c4ffc7a8449fa..15e1c9686dddbb34b923be9b03f22b50
              markupann->setDate(std::move(s));
          } else {
 diff --git a/qt5/src/poppler-form.cc b/qt5/src/poppler-form.cc
-index 0879d59fc54066f7e16b4f46a594c817121b6dbd..6024cf357ec0e5e6d5a5e5408afc69ebacd2dd96 100644
+index 1342eaa83f8b8c5beb64513b348faf19851d166f..54a725d58a4d17f7b8a88df2ac4d3ceb494757b7 100644
 --- a/qt5/src/poppler-form.cc
 +++ b/qt5/src/poppler-form.cc
-@@ -1054,8 +1054,8 @@ static CertificateInfoPrivate *createCertificateInfoPrivate(const X509Certificat
+@@ -1051,8 +1051,8 @@ static CertificateInfoPrivate *createCertificateInfoPrivate(const X509Certificat
+ 
          certPriv->nick_name = QString::fromStdString(ci->getNickName().toStr());
  
-         X509CertificateInfo::Validity certValidity = ci->getValidity();
--        certPriv->validity_start = QDateTime::fromSecsSinceEpoch(certValidity.notBefore, QTimeZone::utc());
--        certPriv->validity_end = QDateTime::fromSecsSinceEpoch(certValidity.notAfter, QTimeZone::utc());
-+        certPriv->validity_start = QDateTime::fromTime_t(certValidity.notBefore, Qt::UTC);
-+        certPriv->validity_end = QDateTime::fromTime_t(certValidity.notAfter, Qt::UTC);
+-        certPriv->validity_start = QDateTime::fromSecsSinceEpoch(std::chrono::duration_cast<std::chrono::seconds>(ci->getValidity().notBefore.time_since_epoch()).count(), QTimeZone::utc());
+-        certPriv->validity_end = QDateTime::fromSecsSinceEpoch(std::chrono::duration_cast<std::chrono::seconds>(ci->getValidity().notAfter.time_since_epoch()).count(), QTimeZone::utc());
++        certPriv->validity_start = QDateTime::fromTime_t(std::chrono::duration_cast<std::chrono::seconds>(ci->getValidity().notBefore.time_since_epoch()).count(), Qt::UTC);
++        certPriv->validity_end = QDateTime::fromTime_t(std::chrono::duration_cast<std::chrono::seconds>(ci->getValidity().notAfter.time_since_epoch()).count(), Qt::UTC);
  
          const X509CertificateInfo::PublicKeyInfo &pkInfo = ci->getPublicKeyInfo();
          certPriv->public_key = QByteArray(pkInfo.publicKey.c_str(), pkInfo.publicKey.size());
-@@ -1165,7 +1165,7 @@ std::pair<SignatureValidationInfo, std::shared_ptr<Poppler::AsyncObject>> FormFi
+@@ -1162,7 +1162,7 @@ std::pair<SignatureValidationInfo, std::shared_ptr<Poppler::AsyncObject>> FormFi
  {
      auto object = std::make_shared<AsyncObject>();
-     FormWidgetSignature *fws = static_cast<FormWidgetSignature *>(m_formData->fm);
+     auto *fws = static_cast<FormWidgetSignature *>(m_formData->fm);
 -    const time_t validationTimeT = validationTime.isValid() ? validationTime.toSecsSinceEpoch() : -1;
 +    const time_t validationTimeT = validationTime.isValid() ? validationTime.toTime_t() : -1;
      SignatureInfo *si = fws->validateSignatureAsync(opt & ValidateVerifyCertificate, opt & ValidateForceRevalidation, validationTimeT, !(opt & ValidateWithoutOCSPRevocationCheck), opt & ValidateUseAIACertFetch,
                                                      [obj = std::weak_ptr<AsyncObject>(object)]() {
                                                          if (auto l = obj.lock()) {
-@@ -1173,11 +1173,15 @@ std::pair<SignatureValidationInfo, std::shared_ptr<Poppler::AsyncObject>> FormFi
+@@ -1170,11 +1170,15 @@ std::pair<SignatureValidationInfo, std::shared_ptr<Poppler::AsyncObject>> FormFi
                                                              // to ensure callers have a chance of connecting to AsyncObject::done
                                                              QMetaObject::invokeMethod(
                                                                      l.get(),
@@ -101,7 +101,7 @@ index 0879d59fc54066f7e16b4f46a594c817121b6dbd..6024cf357ec0e5e6d5a5e5408afc69eb
                                                          }
                                                      });
 diff --git a/qt5/tests/poppler-forms.cpp b/qt5/tests/poppler-forms.cpp
-index 8e6f008e2de8603ad81e64651bf1dac518b437eb..7621d59b06ddc8f1ae1bd8c85ef6621393d91754 100644
+index 7db7af41bed88f9cbcceb32013cc03a5c6eeaa7e..dc3ea8120f11317032d4865e7c3edcbd738c1330 100644
 --- a/qt5/tests/poppler-forms.cpp
 +++ b/qt5/tests/poppler-forms.cpp
 @@ -264,7 +264,11 @@ int main(int argc, char **argv)
