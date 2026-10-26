@@ -9,23 +9,23 @@ This reverts commit 18885fcc7398ddaa0769a2ae7acad46d32db02f9.
  1 file changed, 10 insertions(+)
 
 diff --git a/qt5/src/poppler-annotation.cc b/qt5/src/poppler-annotation.cc
-index 15e1c968..22160925 100644
+index 8f146055740002a08c7d775f2a93f0b6b2a36004..17106d0fd715bcb4cca31ec5c285c4e9dc5a3f3c 100644
 --- a/qt5/src/poppler-annotation.cc
 +++ b/qt5/src/poppler-annotation.cc
-@@ -178,7 +178,11 @@ void getRawDataFromQImage(const QImage &qimg, int bitsPerPixel, QByteArray *data
+@@ -180,7 +180,11 @@ static void getRawDataFromQImage(const QImage &qimg, int bitsPerPixel, std::vect
          break;
      case 8:
      case 24:
 +#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
-         data->append((const char *)qimg.bits(), static_cast<int>(qimg.sizeInBytes()));
+         data->assign(reinterpret_cast<const char *>(qimg.bits()), reinterpret_cast<const char *>(qimg.bits()) + static_cast<int>(qimg.sizeInBytes()));
 +#else
-+        data->append((const char *)qimg.bits(), qimg.byteCount());
++        data->assign(reinterpret_cast<const char *>(qimg.bits()), reinterpret_cast<const char *>(qimg.bits()) + static_cast<int>(qimg.byteCount()));
 +#endif
          break;
      case 32:
-         for (int line = 0; line < height; line++) {
-@@ -1689,7 +1693,11 @@ Annotation::Style Annotation::style() const
-         s.setLineStyle((Annotation::LineStyle)(1 << border->getStyle()));
+         data->reserve(3 * height * width);
+@@ -1695,7 +1699,11 @@ Annotation::Style Annotation::style() const
+         s.setLineStyle(static_cast<Annotation::LineStyle>(1 << border->getStyle()));
  
          const std::vector<double> &dashArray = border->getDash();
 +#if QT_VERSION <= QT_VERSION_CHECK(5, 14, 0)
@@ -35,7 +35,7 @@ index 15e1c968..22160925 100644
 +#endif
      }
  
-     AnnotBorderEffect *border_effect;
+     const AnnotBorderEffect *border_effect;
 @@ -3468,12 +3476,14 @@ std::unique_ptr<AnnotStampImageHelper> StampAnnotationPrivate::convertQImageToAn
      case QImage::Format_Grayscale8:
          bitsPerComponent = 8;
